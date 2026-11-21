@@ -25,7 +25,7 @@ function collapseBlankLines(text: string): string {
 	return text.replace(/\n(?:[ \t]*\r?\n){3,}/g, '\n\n\n');
 }
 
-const PLAIN_YAML = /^[A-Za-z_][\w .\/-]*$/;
+const PLAIN_YAML = /^[A-Za-z_][\w ./-]*$/;
 const YAML_RESERVED = /^(?:true|false|null|yes|no|on|off|~)$/i;
 
 function yamlScalar(value: unknown): string {

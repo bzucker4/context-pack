@@ -1,8 +1,44 @@
-/*
+/* Context Pack: uses Obsidian CSS variables so it follows light and dark themes. */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.context-pack-result {
+	margin-top: var(--size-4-3);
+	padding: var(--size-4-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background-color: var(--background-secondary);
+}
 
-If your plugin does not need CSS, delete this file.
+.context-pack-result:empty {
+	display: none;
+}
 
-*/
+.context-pack-summary {
+	color: var(--text-normal);
+	font-weight: var(--font-semibold);
+}
+
+.context-pack-limits {
+	margin: var(--size-4-2) 0 0;
+	padding-left: var(--size-4-5);
+	font-size: var(--font-ui-small);
+}
+
+.context-pack-limits li.is-pass {
+	color: var(--text-success);
+}
+
+.context-pack-limits li.is-fail {
+	color: var(--text-error);
+}
+
+.context-pack-limit-row .setting-item-control input[type='text']:first-child {
+	min-width: 12em;
+}
+
+.context-pack-limit-row .setting-item-control input[type='text']:nth-child(2) {
+	width: 8em;
+}
+
+.context-pack-saved-row .setting-item-control input[type='text'] {
+	min-width: 14em;
+}
