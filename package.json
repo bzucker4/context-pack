@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "context-pack",
+	"version": "0.1.0",
+	"description": "Bundle selected vault notes into one LLM-ready text block with a token estimate.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
