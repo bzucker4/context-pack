@@ -3,7 +3,8 @@ name: Release Obsidian plugin
 on:
     push:
         tags:
-            - '*'
+            # Plain versions only (e.g. 0.1.0). Obsidian requires no "v" prefix.
+            - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
     build:

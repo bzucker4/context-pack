@@ -1,92 +1,94 @@
-# Obsidian Sample Plugin
+# Context Pack
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Bundle selected notes from your vault into one LLM-ready block of text, with a token estimate and a check against the context limits of the models you care about.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## Commands
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
+Open the command palette and run:
 
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and outputs a Notice on click.
-- Registers a global interval which logs 'setInterval' to the console.
+- **Build context pack** opens a dialog. Pick a source, set the options, then **Build** to see the note count, the token estimate and a pass or fail line for each model limit. **Copy** puts the result on your clipboard. **Save pack** stores the source and options under a name.
+  - **Folder**: every markdown file in the folder, including subfolders.
+  - **Tag**: every note carrying the tag, in frontmatter or inline. Matching ignores case and the leading `#`.
+  - **Note and its links**: the chosen note, plus every note it links to when **Include linked notes** is on. Broken links and non-markdown files are skipped.
+- **Pack current note and its links** builds a pack from the active note (depth 1) with your default options and copies it right away.
+- **Rebuild saved pack** lets you pick a saved pack, then rebuilds it from the vault as it is now and copies it.
 
-## First time developing plugins?
+## File menu
 
-Quick starting guide for new plugin devs:
+Right-click a folder or a note in the file explorer and choose **Copy as context pack**. A folder packs everything under it; a note packs just that note. Both use your default options.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `src/main.ts` to `main.js`.
-- Make changes to `src/main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+## Output
 
-## Releasing new releases
+Notes are sorted by path.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+- **Markdown**: each note becomes a `## Title` section, optionally followed by `Path: ...` and a fenced `yaml` block of its frontmatter, then the body. Notes are separated by `---`.
+- **XML**: everything is wrapped in `<context>`, with one `<note path="..." title="...">` per note containing an optional `<frontmatter>` and a `<body>`. Bodies and frontmatter are wrapped in CDATA, so the content is not escaped.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+Options (set per pack, with defaults in settings):
 
-## Adding your plugin to the community plugin list
+| Option | Effect |
+| --- | --- |
+| Format | Markdown or XML |
+| Include frontmatter | Add each note's frontmatter as YAML |
+| Include file paths | Add each note's vault path |
+| Strip embeds | Remove `![[...]]` embeds |
+| Strip images | Remove `![alt](url)` images and image embeds such as `![[photo.png]]` |
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+Runs of three or more blank lines are collapsed to two.
 
-## How to use
+## Settings
 
-- Clone this repo.
-- Make sure your NodeJS is at least v18 (`node --version`).
-- `npm i` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+In **Settings → Context Pack**:
 
-## Manually installing the plugin
+- **Defaults for new packs**: the format and the four toggles above.
+- **Model limits**: a list of names and token limits that each pack is checked against. The two entries that ship with the plugin are placeholders, so edit them to match the models you use. Add or remove entries as needed.
+- **Saved packs**: rename or delete the packs you saved.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+## Token counts are estimates
 
-## Improve code quality with eslint
+Token counts are a fast approximation (about four characters per token, with runs of whitespace collapsed). They are not produced by any model's real tokenizer, and the real count varies by model and by content. Leave some headroom when a pack is close to a limit.
 
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code.
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+## Installation
 
-## Funding URL
+### Community plugins
 
-You can include funding URLs where people who use your plugin can financially support it.
+Once Context Pack is listed, open **Settings → Community plugins → Browse**, search for "Context Pack", then select **Install** and **Enable**.
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+### Manual
 
-```json
-{
-	"fundingUrl": "https://buymeacoffee.com"
-}
+1. Download `main.js`, `manifest.json` and `styles.css` from the latest [release](../../releases).
+2. Copy them into `<your vault>/.obsidian/plugins/context-pack/`.
+3. Reload Obsidian and enable **Context Pack** under **Settings → Community plugins**.
+
+## Development
+
+```bash
+npm install
+npm run dev     # watch build
+npm test        # unit tests (Vitest)
+npm run build   # type-check and production build
 ```
 
-If you have multiple URLs, you can also do:
+`tests/fixtures/vault` is a small sample vault for manual testing. Open it as a vault in Obsidian and link or copy the built plugin files into its `.obsidian/plugins/context-pack/` folder.
 
-```json
-{
-	"fundingUrl": {
-		"Buy Me a Coffee": "https://buymeacoffee.com",
-		"GitHub Sponsor": "https://github.com/sponsors",
-		"Patreon": "https://www.patreon.com/"
-	}
-}
-```
+## How to release
 
-## API Documentation
+1. Make sure `main` builds and the tests pass.
+2. Bump the version. This updates `package.json`, `manifest.json` and `versions.json` together and stages the changes:
 
-See https://docs.obsidian.md
+   ```bash
+   npm version patch   # or minor, major, or an exact version such as 0.2.0
+   ```
+
+   `npm version` also creates a git commit and a tag named exactly like the version, with no `v` prefix, which is what Obsidian requires.
+3. Push the commit and the tag:
+
+   ```bash
+   git push origin main --follow-tags
+   ```
+
+4. The **Release Obsidian plugin** workflow builds the plugin and creates a **draft** GitHub release with `main.js`, `manifest.json` and `styles.css` attached. Review the draft, add notes, then publish it.
+
+## License
+
+[MIT](LICENSE)
